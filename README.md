@@ -16,6 +16,7 @@ Sample data is required but not provided here.
 Data should be placed in `property_api/data` and should be structured as shown:
 ```
 /data
+  uprns.json (maps UPRNs to lists of Title Numbers)
   /title-number1
     title-number1.json (register)
     /deeds
