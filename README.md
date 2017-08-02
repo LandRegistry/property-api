@@ -10,6 +10,24 @@ Land Registry Flask APIs should be structured going forwards.
 |**GET** /health|Returns some basic information about the app (JSON)|
 |**GET** /health/cascade/\<depth\>|Returns the app's health information as above but also the health information of any database and HTTP dependencies, down to the specified depth (JSON)|
 
+## Data
+
+Sample data is required but not provided here.
+Data should be placed in `property_api/data` and should be structured as shown:
+```
+/data
+  /title-number1
+    title-number1.json (register)
+    /deeds
+      deed1.json
+      deed2.json
+  /title-number2
+    title-number2.json (register)
+    /deeds
+      deed1.json
+(etc.)
+```
+
 ## Quick start
 
 
