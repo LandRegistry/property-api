@@ -9,3 +9,6 @@ integrationtest:
 
 run:
 	python3 manage.py runserver
+
+lint:
+	flake8 ./

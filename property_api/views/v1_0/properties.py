@@ -1,7 +1,6 @@
 from flask import Blueprint, abort
 from property_api.app import app
 
-import glob
 import json
 import os
 
@@ -9,21 +8,14 @@ properties = Blueprint('properties', __name__)
 
 data_dir = app.root_path + "/data"
 
+
 @properties.route("/<uprn>", methods=['GET'])
 def get_property_summaries(uprn):
-    with open("{}/uprns.json".format(data_dir)) as lookup:
-        lookup_data = lookup.read()
-    lookup.closed
-
-    lookup_data = json.loads(lookup_data)
-
-    if uprn in lookup_data:
-        title_numbers = lookup_data[uprn]
-    else:
-        abort(404)
+    property_info = lookup_property_info(uprn)
 
     summaries = []
 
+    title_numbers = property_info['title_numbers']
     for title_number in title_numbers:
         if os.path.exists("{0}/{1}/{1}.json".format(data_dir, title_number)):
             reg_available = True
@@ -31,17 +23,13 @@ def get_property_summaries(uprn):
             reg_available = False
 
         deed_path = "{}/{}/deeds".format(data_dir, title_number)
-        deeds = [deed for deed in glob.glob(deed_path + '/*.json')]
-
-        if not deeds:
-            abort(404)
+        deeds = property_info['deed_ids']
 
         deed_types = []
-
         for deed in deeds:
-            with open(deed) as f2:
-                deed_data = f2.read()
-            f2.closed
+            with open("{}/{}.json".format(deed_path, deed)) as f:
+                deed_data = f.read()
+            f.closed
             deed_types.append(json.loads(deed_data)['deed_type'])
 
         title_summary = {
@@ -49,11 +37,11 @@ def get_property_summaries(uprn):
             "register_available": reg_available,
             "deeds": deed_types
         }
-
         summaries.append(title_summary)
 
     result = {
         "uprn": uprn,
+        "address": property_info['address'],
         "details_held": summaries
     }
 
@@ -62,30 +50,20 @@ def get_property_summaries(uprn):
 
 @properties.route("/<uprn>/landregisters", methods=["GET"])
 def get_property_registers(uprn):
-    with open("{}/uprns.json".format(data_dir)) as lookup:
-        lookup_data = lookup.read()
-    lookup.closed
-
-    lookup_data = json.loads(lookup_data)
-
-    if uprn in lookup_data:
-        title_numbers = lookup_data[uprn]
-    else:
-        abort(404)
+    property_info = lookup_property_info(uprn)
 
     details = []
 
+    title_numbers = property_info['title_numbers']
     for title_number in title_numbers:
         with open("{0}/{1}/{1}.json".format(data_dir, title_number)) as f:
             read_data = f.read()
         f.closed
         details.append(json.loads(read_data))
 
-    if not details:
-        abort(404)
-
     result = {
         "uprn": uprn,
+        "address": property_info['address'],
         "landregisters": details
     }
 
@@ -94,46 +72,75 @@ def get_property_registers(uprn):
 
 @properties.route("/<uprn>/deeds", methods=["GET"])
 def get_property_deeds(uprn):
-    with open("{}/uprns.json".format(data_dir)) as lookup:
+    property_info = lookup_property_info(uprn)
+
+    result_deeds = []
+
+    title_numbers = property_info['title_numbers']
+    for title_number in title_numbers:
+        deed_path = "{}/{}/deeds".format(data_dir, title_number)
+        deeds = property_info['deed_ids']
+
+        deed_list = []
+
+        for deed in deeds:
+            with open("{}/{}.json".format(deed_path, deed)) as f:
+                deed_data = f.read()
+            f.closed
+            deed_list.append(json.loads(deed_data))
+        if deed_list:
+            tn_deeds = {
+                "title_number": title_number,
+                "deeds": deed_list
+            }
+            result_deeds.append(tn_deeds)
+
+    result = {
+        "uprn": uprn,
+        "address": property_info['address'],
+        "deeds": result_deeds
+    }
+
+    return json.dumps(result, sort_keys=True, separators=(',', ':')), 200, {"Content-Type": "application/json"}
+
+
+@properties.route("/<uprn>/deeds/<deed_id>", methods=["GET"])
+def get_property_deed(uprn, deed_id):
+    property_info = lookup_property_info(uprn)
+
+    title_numbers = property_info['title_numbers']
+    for title_number in title_numbers:
+        deed_path = "{}/{}/deeds".format(data_dir, title_number)
+        deeds = property_info['deed_ids']
+
+        if int(deed_id) not in deeds:
+            abort(404)
+
+        if os.path.exists("{}/{}.json".format(deed_path, deed_id)):
+            with open("{}/{}.json".format(deed_path, deed_id)) as f:
+                deed_data = f.read()
+            f.closed
+
+            result = {
+                "title_number": title_number,
+                "deed": json.loads(deed_data),
+                "uprn": uprn,
+                "address": property_info['address']
+            }
+
+    return json.dumps(result, sort_keys=True, separators=(',', ':')), 200, {"Content-Type": "application/json"}
+
+
+def lookup_property_info(uprn):
+    with open("{}/properties.json".format(data_dir)) as lookup:
         lookup_data = lookup.read()
     lookup.closed
 
     lookup_data = json.loads(lookup_data)
 
-    if uprn in lookup_data:
-        title_numbers = lookup_data[uprn]
-    else:
-        abort(404)
+    for property_info in lookup_data['properties']:
+        if 'uprn' in property_info:
+            if property_info['uprn'] == uprn:
+                return property_info
 
-    deeds = []
-
-    for title_number in title_numbers:
-        deed_path = "{}/{}/deeds".format(data_dir, title_number)
-        deeds = [deed for deed in glob.glob(deed_path + '/*.json')]
-
-        if not deeds:
-            abort(404)
-
-        deed_results = []
-
-        for deed in deeds:
-            with open(deed) as f2:
-                deed_data = f2.read()
-            f2.closed
-            deed_results.append(json.loads(deed_data))
-        if deed_results:
-            tn_deeds = {
-                "title_number": title_number,
-                "deeds": deed_results
-            }
-            deeds.append(tn_deeds)
-
-    if not deeds:
-        abort(404)
-
-    result = {
-        "uprn": uprn,
-        "deeds": deeds
-    }
-
-    return json.dumps(result, sort_keys=True, separators=(',', ':')), 200, {"Content-Type": "application/json"}
+    abort(404)
