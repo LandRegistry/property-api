@@ -9,10 +9,10 @@ Land Registry Flask APIs should be structured going forwards.
 |---|---|
 |**GET** /health|Returns some basic information about the app (JSON)|
 |**GET** /health/cascade/\<depth\>|Returns the app's health information as above but also the health information of any database and HTTP dependencies, down to the specified depth (JSON)|
-|**GET** /v1/properties/<uprn>|Returns a summary of what is availble for the given UPRN|
-|**GET** /v1/properties/<uprn>/deeds|Returns a list of all deeds for the UPRN, in JSON format|
-|**GET** /v1/properties/<uprn>/deeds/<deed_id>|Returns a specific deed, in JSON format|
-|**GET** /v1/properties/<uprn>/landregisters|Returns a list of Registers for the given UPRN, in JSON format|
+|**GET** /v1/properties/\<uprn\>|Returns a summary of what is availble for the given UPRN|
+|**GET** /v1/properties/\<uprn\>/deeds|Returns a list of all deeds for the UPRN, in JSON format|
+|**GET** /v1/properties/\<uprn\>/deeds/\<deed_id\>|Returns a specific deed, in JSON format|
+|**GET** /v1/properties/\<uprn\>/landregisters|Returns a list of Registers for the given UPRN, in JSON format|
 
 ## Data
 
