@@ -30,7 +30,7 @@ def get_property_summaries(uprn):
             with open("{}/{}.json".format(deed_path, deed)) as f:
                 deed_data = f.read()
             f.closed
-            deed_types.append(json.loads(deed_data)['deed_type'])
+            deed_types.append({"id": deed, "deed_type": json.loads(deed_data)['deed_type']})
 
         title_summary = {
             "title_number": title_number,

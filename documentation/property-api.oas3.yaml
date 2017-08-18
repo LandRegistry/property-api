@@ -140,8 +140,14 @@ components:
               deeds:
                 type: array
                 items:
-                  type: string
-                  example: charge
+                  type: object
+                  properties:
+                    deed_type:
+                      type: string
+                      example: abstract
+                    id:
+                      type: integer
+                      example: 1234567
               register_available:
                 type: boolean
                 example: true
@@ -414,6 +420,10 @@ components:
     Title_Number:
       type: string
       example: AB12345
+    Postcode:
+      type: string
+      pattern: '^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$'
+      example: AB1 1BA
     Property_Ownership_Group:
       type: object
       additionalProperties: false
@@ -458,10 +468,7 @@ components:
             $ref: '#/components/schemas/Property_Infill'
         full_text:
           type: string
-          example: >-
-            The Freehold land shown edged with red on the plan of the above
-            Title filed at the Registry and being 1 Something Street, A place,
-            (AB1 1BA).
+          example: 'The Freehold land shown edged with red on the plan of the above Title filed at the Registry and being 1 Something Street, A place, (AB1 1BA).'
         language:
           type: string
           example: ENG
@@ -472,9 +479,7 @@ components:
           $ref: '#/components/schemas/Timestamp'
         template_text:
           type: string
-          example: >-
-            The Freehold land shown edged with red on the plan of the above
-            Title filed at the Registry and being *AD*
+          example: 'The Freehold land shown edged with red on the plan of the above Title filed at the Registry and being *AD*'
         sub_register:
           type: string
           example: A
@@ -506,12 +511,7 @@ components:
             addr_id:
               $ref: '#/components/schemas/Timestamp'
             postcode:
-              type: string
-              pattern: >-
-                ^(GIR
-                0AA)|(((A[BL]|B[ABDFHLNRSTX]?|C[ABFHMORTVW]|D[ADEGHLNTY]|E[HNX]?|F[KY]|G[LUY]?|H[ADGPRSUX]|I[GMPV]|JE|K[ATWY]|L[ADELNSU]?|M[EKL]?|N[EGNPRW]?|O[LX]|P[AEHLOR]|R[GHM]|S[AEGKLMNOPRSTY]?|T[ADFNQRSW]|UB|W[ADFNRSV]|YO|ZE)[1-9]?[0-9]|((E|N|NW|SE|SW|W)1|EC[1-4]|WC[12])[A-HJKMNPR-Y]|(SW|W)([2-9]|[1-9][0-9])|EC[1-9][0-9])
-                [0-9][ABD-HJLNP-UW-Z]{2})$
-              example: AB1 1BA
+              $ref: '#/components/schemas/Postcode'
             auto_uppercase_override:
               type: boolean
               example: true
@@ -533,12 +533,7 @@ components:
           example: A
         full_text:
           type: string
-          example: >-
-            The land has the benefit of the following rights granted by the
-            Conveyance dated 04 January 1940 referred to in the Charges
-            Register:- Together with the right in common with others similarly
-            entitled thereto to use the road or lane running at the side of the
-            property hereby conveyed and leading to the rear thereof.
+          example: 'The land has the benefit of the following rights granted by the Conveyance dated 04 January 1940 referred to in the Charges Register:- Together with the right in common with others similarly entitled thereto to use the road or lane running at the side of the property hereby conveyed and leading to the rear thereof.'
         language:
           type: string
           example: ENG
@@ -563,12 +558,7 @@ components:
           $ref: '#/components/schemas/Timestamp'
         template_text:
           type: string
-          example: >-
-            The land has the benefit of the following rights granted by the *DT*
-            dated *DD* referred to in the Charges Register:- Together with the
-            right in common with others similarly entitled thereto to use the
-            road or lane running at the side of the property hereby conveyed and
-            leading to the rear thereof.
+          example: 'The land has the benefit of the following rights granted by the *DT* dated *DD* referred to in the Charges Register:- Together with the right in common with others similarly entitled thereto to use the road or lane running at the side of the property hereby conveyed and leading to the rear thereof.'
         ff_text_id:
           type: string
           format: date-time
@@ -637,9 +627,7 @@ components:
           example: B
         full_text:
           type: string
-          example: >-
-            PROPRIETOR: JOHN DOE and JANE DOE of 101 Example Street, Town, City
-            AB1 1BA.
+          example: 'PROPRIETOR: JOHN DOE and JANE DOE of 101 Example Street, Town, City AB1 1BA.'
         language:
           type: string
           example: ENG
@@ -846,7 +834,7 @@ components:
       properties:
         id:
           type: integer
-          example: 1000000
+          example: 1234567
         deed_type:
           type: string
           example: abstract
@@ -873,9 +861,7 @@ components:
           example: '£150,000.00'
         declaration_of_trust:
           type: string
-          example: >-
-            The transferee is more than one person and they are to hold the
-            property on trust for themselves as joint tenants
+          example: 'The transferee is more than one person and they are to hold the property on trust for themselves as joint tenants'
         additional_provisions:
           type: array
           items:
@@ -978,8 +964,7 @@ components:
           type: string
           example: City
         postcode:
-          type: string
-          example: AB1 1BA
+          $ref: '#/components/schemas/Postcode'
         country_code:
           type: string
           example: GB
