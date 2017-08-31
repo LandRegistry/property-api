@@ -2,9 +2,29 @@ from flask import request, Blueprint, Response
 from flask import current_app, g
 import datetime
 import json
+import urllib
+from property_api.app import app
 
 # This is the blueprint object that gets registered into the app in blueprints.py.
 general = Blueprint('general', __name__)
+
+
+@general.route("/", methods=['GET'])
+def get_routes():
+    output = []
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != 'static' and rule.endpoint != 'general.get_routes':
+            rule_methods = ",".join(rule.methods).split(',')
+            rule_methods.remove('HEAD')
+            rule_methods.remove('OPTIONS')
+            line = urllib.parse.unquote("{}, methods={}".format(rule, rule_methods))
+            output.append(line)
+
+    result = {
+        "endpoints": sorted(output)
+    }
+
+    return json.dumps(result, sort_keys=True, separators=(',', ':')), 200, {"Content-Type": "application/json"}
 
 
 @general.route("/health")

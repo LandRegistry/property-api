@@ -1,0 +1,984 @@
+openapi: 3.0.0
+servers: []
+info:
+  description: API to return mocked property data
+  version: 1.0.0
+  title: Property API
+paths:
+  /:
+    get:
+      summary: Display API routes
+      description: Displays the routes available on the API
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoints'
+  '/v1/properties/{uprn}':
+    get:
+      tags:
+        - v1
+      summary: Find property summary by UPRN
+      description: Returns summary of information stored for the supplied UPRN
+      parameters:
+        - name: uprn
+          in: path
+          description: UPRN for summary to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+        '404':
+          description: UPRN not found
+  '/v1/properties/{uprn}/landregisters':
+    get:
+      tags:
+        - v1
+      summary: Find property register by UPRN
+      description: Returns land registers that apply to supplied UPRN
+      parameters:
+        - name: uprn
+          in: path
+          description: UPRN for register(s) to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+        '404':
+          description: UPRN not found
+  '/v1/properties/{uprn}/deeds/{deed_id}':
+    get:
+      tags:
+        - v1
+      summary: Find specific deed for a UPRN
+      description: Returns stored deed for the supplied UPRN
+      parameters:
+        - name: uprn
+          in: path
+          description: UPRN to find the deed for
+          required: true
+          schema:
+            type: integer
+        - name: deed_id
+          in: path
+          description: the deed_id to find
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Single_Deed'
+        '404':
+          description: UPRN not found
+  '/v1/properties/{uprn}/deeds':
+    get:
+      tags:
+        - v1
+      summary: Find all deeds for a UPRN
+      description: Returns stored deeds for the supplied UPRN
+      parameters:
+        - name: uprn
+          in: path
+          description: UPRN to find the deeds for
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deeds'
+        '404':
+          description: UPRN not found
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+components:
+  schemas:
+    Endpoints:
+      type: object
+      additionalProperties: false
+      properties:
+        endpoints:
+          type: array
+          items:
+            type: string
+            example: '/v1/properties//landregisters, methods=[''GET'']'
+    Summary:
+      type: object
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+          example: '101 Example Street, Area, Town, City AB1 1BA'
+        details_held:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              deeds:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    deed_type:
+                      type: string
+                      example: abstract
+                    id:
+                      type: integer
+                      example: 1234567
+              register_available:
+                type: boolean
+                example: true
+              title_number:
+                $ref: '#/components/schemas/Title_Number'
+        uprn:
+          type: string
+          pattern: ^\d+$
+          example: '12345'
+    Register:
+      type: object
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+          example: '101 Example Street, Area, Town, City AB1 1BA'
+        uprn:
+          type: string
+          pattern: ^\d+$
+          example: '12345'
+        landregisters:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              lr_uprns:
+                type: array
+                items:
+                  type: integer
+                  example: 12345678
+              migration_errors:
+                $ref: '#/components/schemas/Migration_Errors'
+              last_app_timestamp:
+                type: string
+                format: date-time
+              geometry:
+                type: object
+                additionalProperties: false
+                properties:
+                  index:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      geometry:
+                        $ref: '#/components/schemas/Geometry'
+                      crs:
+                        $ref: '#/components/schemas/Geometry_CRS'
+                      type:
+                        type: string
+                        example: Feature
+                      properties:
+                        $ref: '#/components/schemas/Geometry_Properties'
+                  extent:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      geometry:
+                        $ref: '#/components/schemas/Geometry'
+                      crs:
+                        $ref: '#/components/schemas/Geometry_CRS'
+                      type:
+                        type: string
+                        example: Feature
+                      properties:
+                        $ref: '#/components/schemas/Geometry_Properties'
+                  map:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      crs:
+                        $ref: '#/components/schemas/Geometry_CRS'
+                      type:
+                        type: string
+                        example: FeatureCollection
+                      properties:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          scale:
+                            type: string
+                            example: '1234 '
+                          print_size:
+                            type: string
+                            example: A4
+                          orientation_code:
+                            type: string
+                            example: P
+                          map_reference:
+                            type: string
+                            example: ST1234NW
+                          stamp_code_1:
+                            type: string
+                            example: ' '
+                          stamp_code_2:
+                            type: string
+                            example: ' '
+                          stamp_code_3:
+                            type: string
+                            example: ' '
+                          stamp_code_4:
+                            type: string
+                            example: ' '
+                          stamp_code_5:
+                            type: string
+                            example: ' '
+                          stamp_text_1:
+                            type: string
+                            example: ' '
+                          stamp_text_2:
+                            type: string
+                            example: ' '
+                          stamp_text_3:
+                            type: string
+                            example: ' '
+                          stamp_text_4:
+                            type: string
+                            example: ' '
+                          stamp_text_5:
+                            type: string
+                            example: ' '
+                      features:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            geometry:
+                              $ref: '#/components/schemas/Geometry'
+                            type:
+                              type: string
+                              example: Feature
+                            properties:
+                              $ref: '#/components/schemas/Geometry_Properties'
+              edition_date:
+                $ref: '#/components/schemas/Date'
+              raster_plan_quality:
+                type: string
+                example: SUFFICIENT
+              application_reference:
+                type: string
+                example: A123BCD
+              districts:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    name:
+                      type: string
+                      example: CITY OF BRISTOL
+              dlr:
+                type: string
+                example: Gloucester Office
+              title_number:
+                $ref: '#/components/schemas/Title_Number'
+              groups:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Property_Ownership_Group'
+                    - $ref: '#/components/schemas/Other_Group'
+              tenure:
+                type: string
+                example: Freehold
+              filed_plan_format:
+                type: string
+                example: RASTER
+              class:
+                type: string
+                example: Absolute
+              closure_status:
+                type: string
+                example: OPEN
+    Geometry:
+      type: object
+      additionalProperties: false
+      properties:
+        coordinates:
+          type: array
+        type:
+          type: string
+          example: Polygon
+    Geometry_CRS:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          example: name
+        properties:
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+              example: 'urn:ogc:def:crs:EPSG::27700'
+    Geometry_Properties:
+      type: object
+      additionalProperties: false
+      properties:
+        feature_id:
+          type: integer
+          example: 1234
+        width:
+          type: integer
+          example: 0
+        height:
+          type: integer
+          example: 1000
+        colour:
+          type: integer
+          example: 1
+        render_attributes:
+          type: object
+          additionalProperties: false
+          properties:
+            exterior_edge_colour:
+              type: integer
+              example: 1
+            fill_colour:
+              type: integer
+              example: 20
+            exterior_edge_thickness:
+              type: number
+              format: float
+              example: 2.5
+            render_level:
+              type: string
+              example: '0'
+            fill_style:
+              type: integer
+              example: 5
+            border_width:
+              type: integer
+              example: 0
+            border_colour:
+              type: integer
+              example: 1
+            text_horizontal_alignment:
+              type: string
+              example: Left
+            text_vertical_alignment:
+              type: string
+              example: Full Bottom
+        graphic_type:
+          type: string
+          example: Bordered Polygon
+        value:
+          type: string
+          example: House
+        vertical_alignment:
+          type: string
+          example: Full Bottom
+        horizontal_alignment:
+          type: string
+          example: Left
+        rotation:
+          type: number
+          format: float
+          example: -0.12
+    Date:
+      type: string
+      format: date
+      example: '2017-01-04'
+    Timestamp:
+      type: string
+      pattern: '^\d{4}-[01]\d-[0-3]\d [0-2]\d:[0-5]\d:[0-5]\d\.\d{6}$'
+      example: '2017-01-04 12:34:56.123456'
+    Title_Number:
+      type: string
+      example: AB12345
+    Postcode:
+      type: string
+      pattern: '^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$'
+      example: AB1 1BA
+    Property_Ownership_Group:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: PROPERTY
+        entries:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Property_Entry'
+              - $ref: '#/components/schemas/Ownership_Entry'
+    Other_Group:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: PROPERTY
+        group_id:
+          $ref: '#/components/schemas/Timestamp'
+        entries:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Deed_Entry'
+              - $ref: '#/components/schemas/Charge_Entry'
+    Property_Entry:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: PROPERTY
+        status:
+          type: string
+          example: Current
+        infills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property_Infill'
+        full_text:
+          type: string
+          example: 'The Freehold land shown edged with red on the plan of the above Title filed at the Registry and being 1 Something Street, A place, (AB1 1BA).'
+        language:
+          type: string
+          example: ENG
+        role_code:
+          type: string
+          example: RDES
+        entry_id:
+          $ref: '#/components/schemas/Timestamp'
+        template_text:
+          type: string
+          example: 'The Freehold land shown edged with red on the plan of the above Title filed at the Registry and being *AD*'
+        sub_register:
+          type: string
+          example: A
+        sequence_number:
+          type: integer
+          example: 1
+        entry_date:
+          $ref: '#/components/schemas/Date'
+    Property_Infill:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          example: Address
+        address:
+          type: object
+          additionalProperties: false
+          properties:
+            town:
+              type: string
+              example: Town
+            street_name:
+              type: string
+              example: Example Street
+            address_string:
+              type: string
+              example: '101 Example Street, Town (AB1 1BA)'
+            addr_id:
+              $ref: '#/components/schemas/Timestamp'
+            postcode:
+              $ref: '#/components/schemas/Postcode'
+            auto_uppercase_override:
+              type: boolean
+              example: true
+            house_no:
+              type: string
+              example: '101'
+    Deed_Entry:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: DEED
+        status:
+          type: string
+          example: Current
+        sub_register:
+          type: string
+          example: A
+        full_text:
+          type: string
+          example: 'The land has the benefit of the following rights granted by the Conveyance dated 04 January 1940 referred to in the Charges Register:- Together with the right in common with others similarly entitled thereto to use the road or lane running at the side of the property hereby conveyed and leading to the rear thereof.'
+        language:
+          type: string
+          example: ENG
+        deeds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deed_Deed'
+        infills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Other_Infill'
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deed_Notes'
+        schedule:
+          $ref: '#/components/schemas/Deed_Schedule'
+        role_code:
+          type: string
+          example: DAEA
+        entry_id:
+          $ref: '#/components/schemas/Timestamp'
+        template_text:
+          type: string
+          example: 'The land has the benefit of the following rights granted by the *DT* dated *DD* referred to in the Charges Register:- Together with the right in common with others similarly entitled thereto to use the road or lane running at the side of the property hereby conveyed and leading to the rear thereof.'
+        ff_text_id:
+          type: string
+          format: date-time
+        sequence_number:
+          type: integer
+          example: 1
+    Deed_Deed:
+      type: object
+      additionalProperties: false
+      properties:
+        date:
+          $ref: '#/components/schemas/Date'
+        deed_id:
+          $ref: '#/components/schemas/Timestamp'
+        description:
+          type: string
+          example: Conveyance
+    Other_Infill:
+      type: object
+      additionalProperties: false
+      properties:
+        date:
+          $ref: '#/components/schemas/Date'
+        text:
+          type: string
+          example: of the land in this title
+        infill_id:
+          $ref: '#/components/schemas/Timestamp'
+        type:
+          type: string
+          example: EXTENT
+    Deed_Schedule:
+      type: object
+      additionalProperties: false
+      properties:
+        header:
+          type: string
+          example: Schedule of restrictive covenants
+        parent_register:
+          type: string
+          example: C
+        schedule_type:
+          type: string
+          example: E
+    Deed_Notes:
+      type: object
+      additionalProperties: false
+      properties:
+        text:
+          type: string
+          example: Abstract_filed
+        note_id:
+          $ref: '#/components/schemas/Timestamp'
+    Ownership_Entry:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: OWNERSHIP
+        status:
+          type: string
+          example: Current
+        sub_register:
+          type: string
+          example: B
+        full_text:
+          type: string
+          example: 'PROPRIETOR: JOHN DOE and JANE DOE of 101 Example Street, Town, City AB1 1BA.'
+        language:
+          type: string
+          example: ENG
+        role_code:
+          type: string
+          example: RPRO
+        entry_id:
+          $ref: '#/components/schemas/Timestamp'
+        template_text:
+          type: string
+          example: 'PROPRIETOR: *RP*'
+        sequence_number:
+          type: integer
+          example: 1
+        entry_date:
+          $ref: '#/components/schemas/Date'
+        draft_entry_code:
+          type: string
+          example: VHOEZ
+        draft_entry_version:
+          type: integer
+          example: 1
+        infills:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Ownership_Infill'
+              - $ref: '#/components/schemas/Other_Infill'
+    Ownership_Infill:
+      type: object
+      additionalProperties: false
+      properties:
+        proprieters:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              prop_id:
+                $ref: '#/components/schemas/Timestamp'
+              addresses:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+              name:
+                $ref: '#/components/schemas/Proprietor_Name'
+        type:
+          type: string
+          example: Proprietor
+    Address:
+      type: object
+      additionalProperties: false
+      properties:
+        auto_uppercase_override:
+          type: boolean
+          example: true
+        address_type:
+          type: string
+          example: UK
+        addr_id:
+          $ref: '#/components/schemas/Timestamp'
+        address_string:
+          type: string
+          example: '101 Example Street, Town, City AB1 1BA'
+        postal_county:
+          type: string
+          example: City
+    Proprietor_Name:
+      type: object
+      additionalProperties: false
+      properties:
+        auto_uppercase_override:
+          type: boolean
+          example: true
+        name_category:
+          type: string
+          example: PRIVATE INDIVIDUAL
+        name_id:
+          $ref: '#/components/schemas/Timestamp'
+        surname:
+          type: string
+          example: DOE
+        forename:
+          type: string
+          example: JANE
+    Charge_Entry:
+      type: object
+      additionalProperties: false
+      properties:
+        category:
+          type: string
+          example: CHARGE
+        status:
+          type: string
+          example: Current
+        infills:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Other_Infill'
+              - $ref: '#/components/schemas/Charge_Infill'
+        language:
+          type: string
+          example: ENG
+        full_text:
+          type: string
+          example: REGISTERED CHARGE dated 04 January 1999.
+        draft_entry_code:
+          type: string
+          example: VHOEZ
+        charge_id:
+          $ref: '#/components/schemas/Timestamp'
+        draft_entry_version:
+          type: integer
+          example: 1
+        role_code:
+          type: string
+          example: DAEA
+        entry_id:
+          $ref: '#/components/schemas/Timestamp'
+        template_text:
+          type: string
+          example: REGISTERED CHARGE dated *CD*.
+        sub_register:
+          type: string
+          example: A
+        sequence_number:
+          type: integer
+          example: 1
+        entry_date:
+          $ref: '#/components/schemas/Date'
+    Charge_Infill:
+      type: object
+      additionalProperties: false
+      properties:
+        proprieters:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              addresses:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+              name:
+                $ref: '#/components/schemas/Charge_Name'
+        type:
+          type: string
+          example: Charge Proprietor
+    Charge_Name:
+      type: object
+      additionalProperties: false
+      properties:
+        non_private_individual_name:
+          type: string
+          example: Example Bank PLC
+    Migration_Errors:
+      type: object
+      additionalProperties: false
+      properties:
+        extractor:
+          type: string
+          example: Geometry Extractor
+        message:
+          type: string
+          example: File Plan not vectorised
+        message_number:
+          type: string
+          example: GE1234
+    Deeds:
+      type: object
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+          example: '101 Example Street, Area, Town, City AB1 1BA'
+        uprn:
+          type: string
+          pattern: ^\d+$
+          example: '12345'
+        deeds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deed'
+    Single_Deed:
+      type: object
+      additionalProperties: false
+      properties:
+        title_number:
+          $ref: '#/components/schemas/Title_Number'
+        address:
+          type: string
+          example: '101 Example Street, Area, Town, City AB1 1BA'
+        uprn:
+          type: string
+          pattern: ^\d+$
+          example: '12345'
+        deed:
+          $ref: '#/components/schemas/Deed'
+    Deed:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          example: 1234567
+        deed_type:
+          type: string
+          example: abstract
+        deed_date:
+          type: string
+          pattern: '^[0-3]\d\.[01]\d\.\d{4}$'
+          example: 04.01.2012
+        title_number:
+          $ref: '#/components/schemas/Title_Number'
+        deed_language:
+          enum:
+            - English
+            - Welsh
+          example: English
+        doc_access_level:
+          type: integer
+          example: 1
+        parties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Party'
+        consideration:
+          type: string
+          example: '£150,000.00'
+        declaration_of_trust:
+          type: string
+          example: 'The transferee is more than one person and they are to hold the property on trust for themselves as joint tenants'
+        additional_provisions:
+          type: array
+          items:
+            type: string
+            example: Example Bank Mortgage Conditions
+        register_entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Register_Entries'
+        registerable_clause:
+          type: array
+          items:
+            type: string
+        other_clause:
+          type: array
+          items:
+            type: string
+        charge_purpose:
+          type: string
+          example: primary loan
+        deed_status:
+          type: string
+          example: current registered
+        deed_geometry:
+          type: object
+          additionalProperties: false
+          properties:
+            geometry:
+              $ref: '#/components/schemas/Geometry'
+            crs:
+              $ref: '#/components/schemas/Geometry_CRS'
+            type:
+              type: string
+              example: Feature
+            properties:
+              $ref: '#/components/schemas/Geometry_Properties'
+    Party:
+      type: object
+      additionalProperties: false
+      properties:
+        party_capacity:
+          type: string
+          example: vendor
+        party_type:
+          type: array
+          items:
+            type: string
+            example: Private Individual
+        party_pi_surname:
+          type: string
+          example: Doe
+        party_pi_forename:
+          type: string
+          example: Jane
+        company_registration_number:
+          type: integer
+          example: 668
+        party_non_pi_name:
+          type: string
+          example: Example Bank PLC
+        execution_document_signature_type:
+          type: string
+          example: not required
+        execution_document_signatory_capacity:
+          type: string
+          example: personal
+        execution_document_signatory_pi_sname:
+          type: string
+          example: Doe
+        execution_document_signatory_pi_fname:
+          type: string
+          example: John
+        execution_signatory_witness:
+          type: string
+          example: not required
+        address_type:
+          type: string
+          example: postal
+        party_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Party_Address'
+    Party_Address:
+      type: object
+      additionalProperties: false
+      properties:
+        address_string:
+          type: string
+          example: '101 Example Street, An Area, City AB1 1BA'
+        house_no:
+          type: string
+          example: 101
+        street:
+          type: string
+          example: Example Street
+        locality:
+          type: string
+          example: An Area
+        town:
+          type: string
+          example: City
+        postcode:
+          $ref: '#/components/schemas/Postcode'
+        country_code:
+          type: string
+          example: GB
+        country_subdivision:
+          type: string
+          example: England
+    Register_Entries:
+      type: object
+      additionalProperties: false
+      properties:
+        entry_no:
+          type: string
+          example: C1
+        entry_id:
+          type: string
+          pattern: '^\d{4}-[01]\d-[0-3]\d-[0-2]\d:[0-5]\d:[0-5]\d\.\d{6}$'
+          example: '2017-01-04-12:34:56.123456'
