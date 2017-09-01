@@ -13,6 +13,7 @@ Land Registry Flask APIs should be structured going forwards.
 |**GET** /v1/properties/\<uprn\>/deeds|Returns a list of all deeds for the UPRN, in JSON format|
 |**GET** /v1/properties/\<uprn\>/deeds/\<deed_id\>|Returns a specific deed, in JSON format|
 |**GET** /v1/properties/\<uprn\>/landregisters|Returns a list of Registers for the given UPRN, in JSON format|
+|**GET** /v1/properties/\<uprn\>/con29|Returns a CON29 search for the given UPRN, in JSON format|
 
 ## Data
 
@@ -30,6 +31,9 @@ Data should be placed in `property_api/data` and should be structured as shown:
     title-number2.json (register)
     /deeds
       deed_id3.json
+  /CON29
+    con29_id1.json
+    con29_id2.json
 (etc.)
 ```
 
