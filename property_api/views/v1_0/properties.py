@@ -27,7 +27,7 @@ def get_property_summaries(uprn):
 
         deed_types = []
         for deed in deeds:
-            with open("{}/{}.json".format(deed_path, deed)) as f:
+            with open("{}/{}.json".format(deed_path, deed), mode='r', encoding='utf-8-sig') as f:
                 deed_data = f.read()
             f.closed
             deed_types.append(
@@ -86,7 +86,7 @@ def get_property_deeds(uprn):
         deed_list = []
 
         for deed in deeds:
-            with open("{}/{}.json".format(deed_path, deed)) as f:
+            with open("{}/{}.json".format(deed_path, deed), mode='r', encoding='utf-8-sig') as f:
                 deed_data = f.read()
             f.closed
             deed_list.append(json.loads(deed_data))
@@ -119,7 +119,7 @@ def get_property_deed(uprn, deed_id):
             abort(404)
 
         if os.path.exists("{}/{}.json".format(deed_path, deed_id)):
-            with open("{}/{}.json".format(deed_path, deed_id)) as f:
+            with open("{}/{}.json".format(deed_path, deed_id), mode='r', encoding='utf-8-sig') as f:
                 deed_data = f.read()
             f.closed
 

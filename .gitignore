@@ -1,5 +1,4 @@
 property-api/property_api/data/
-person-api/person_api/data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
