@@ -44,6 +44,7 @@ def get_property_summaries(uprn):
     result = {
         "uprn": uprn,
         "address": property_info['address'],
+        "value": property_info["property_value"],
         "details_held": summaries
     }
 
